@@ -24,7 +24,7 @@
   
     async function fetchActivities() {
       try {
-        const response = await axios.get('/api/activities', {
+        const response = await axios.get('https://usermanagementsystem-z2sv.onrender.com/api/activities', {
           headers: { Authorization: `Bearer ${user.id}` }
         });
         activities = response.data;
@@ -38,11 +38,17 @@
       try {
         let response;
         if (authMode === 'signup') {
-          response = await axios.post('/api/auth/signup', { email, password, name });
+          try{
+            response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/signup', { email, password, name });
+          
+           } catch (error) {
+            console.error('Signup error:', error.response ? error.response.data : error.message);
+            // Handle error (e.g., display error message to user)
+          }
           currentAction = 'SIGNUP';
           view = 'signupSuccess';
         } else {
-          response = await axios.post('/api/auth/login', { email, password });
+          response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/login', { email, password });
           currentAction = 'LOGIN';
           user = response.data.user;
           localStorage.setItem('user', JSON.stringify(user));
@@ -56,7 +62,7 @@
   
     async function handleLogout() {
       try {
-        await axios.post('/api/auth/logout', { email: user.email });
+        await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/logout', { email: user.email });
         localStorage.removeItem('user');
         user = null;
         activities = [];
