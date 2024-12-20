@@ -33,21 +33,26 @@
         error = 'Failed to fetch activities';
       }
     }
-  
     async function handleAuth() {
       try {
         let response;
         if (authMode === 'signup') {
-          try{
+          try {
             response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/signup', { email, password, name });
-          
-           } catch (error) {
-            console.error('Signup error:', error.response ? error.response.data : error.message);
-            // Handle error (e.g., display error message to user)
+            currentAction = 'SIGNUP';
+            view = 'signupSuccess';
+          } catch (error) {
+            if (error.response && error.response.status === 409) {
+              // 409 is the status code for conflict, which we're using for existing user
+              error = 'User with this email already exists. Please login instead.';
+            } else {
+              error = error.response?.data?.error || 'An error occurred during signup';
+            }
+            console.error('Signup error:', error);
+            return; // Exit the function here to prevent further execution
           }
-          currentAction = 'SIGNUP';
-          view = 'signupSuccess';
         } else {
+          // Login logic remains the same
           response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/login', { email, password });
           currentAction = 'LOGIN';
           user = response.data.user;
@@ -59,7 +64,7 @@
         error = err.response?.data?.error || `An error occurred during ${authMode}`;
       }
     }
-  
+    
     async function handleLogout() {
       try {
         await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/logout', { email: user.email });
