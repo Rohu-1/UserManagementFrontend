@@ -34,36 +34,40 @@
       }
     }
     async function handleAuth() {
-      try {
-        let response;
-        if (authMode === 'signup') {
-          try {
-            response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/signup', { email, password, name });
-            currentAction = 'SIGNUP';
-            view = 'signupSuccess';
-          } catch (error) {
-            if (error.response && error.response.status === 409) {
-              // 409 is the status code for conflict, which we're using for existing user
-              error = 'User with this email already exists. Please login instead.';
-            } else {
-              error = error.response?.data?.error || 'An error occurred during signup';
-            }
-            console.error('Signup error:', error);
-            return; // Exit the function here to prevent further execution
-          }
-        } else {
-          // Login logic remains the same
-          response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/login', { email, password });
-          currentAction = 'LOGIN';
-          user = response.data.user;
-          localStorage.setItem('user', JSON.stringify(user));
-          view = 'dashboard';
-          await fetchActivities();
-        }
-      } catch (err) {
-        error = err.response?.data?.error || `An error occurred during ${authMode}`;
+  try {
+    let response;
+    if (authMode === 'signup') {
+      // Client-side password validation
+      if (password.length < 8) {
+        error = 'Password must be at least 8 characters long';
+        return; // Exit the function to prevent the API call
       }
+
+      try {
+        response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/signup', { email, password, name });
+        currentAction = 'SIGNUP';
+        view = 'signupSuccess';
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          error = 'User with this email already exists. Please login instead.';
+        } else {
+          error = error.response?.data?.error || 'An error occurred during signup';
+        }
+        console.error('Signup error:', error);
+      }
+    } else {
+      // Login logic
+      response = await axios.post('https://usermanagementsystem-z2sv.onrender.com/api/auth/login', { email, password });
+      currentAction = 'LOGIN';
+      user = response.data.user;
+      localStorage.setItem('user', JSON.stringify(user));
+      view = 'dashboard';
+      await fetchActivities();
     }
+  } catch (err) {
+    error = err.response?.data?.error || `An error occurred during ${authMode}`;
+  }
+}
     
     async function handleLogout() {
       try {
@@ -98,6 +102,10 @@
             {/if}
             <input type="email" placeholder="Email" bind:value={email} required>
             <input type="password" placeholder="Password" bind:value={password} required>
+             <!-- Add the error message display here -->
+          {#if error}
+          <p class="error">{error}</p>
+        {/if}
             <button type="submit">{authMode === 'signup' ? 'Sign Up' : 'Login'}</button>
           </form>
           <p>
