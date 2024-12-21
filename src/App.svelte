@@ -21,7 +21,9 @@
         await fetchActivities();
       }
     });
-  
+    function clearError() {
+      error = '';
+    }
     async function fetchActivities() {
       try {
         const response = await axios.get('https://usermanagementsystem-z2sv.onrender.com/api/activities', {
@@ -102,6 +104,8 @@
             {/if}
             <input type="email" placeholder="Email" bind:value={email} required>
             <input type="password" placeholder="Password" bind:value={password} required>
+            <input type="password" placeholder="Password" bind:value={password} on:input={clearError} required>
+  
              <!-- Add the error message display here -->
           {#if error}
           <p class="error">{error}</p>
@@ -114,9 +118,9 @@
               {authMode === 'signup' ? 'Login' : 'Sign Up'}
             </button>
           </p>
-          {#if error}
+          <!-- {#if error}
             <p class="error">{error}</p>
-          {/if}
+          {/if} -->
         </div>
       </div>
     {:else if view === 'signupSuccess'}
