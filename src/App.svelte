@@ -103,7 +103,7 @@
               <input type="text" placeholder="Name" bind:value={name} required>
             {/if}
             <input type="email" placeholder="Email" bind:value={email} required>
-            <input type="password" placeholder="Password" bind:value={password} required>
+            <!-- <input type="password" placeholder="Password" bind:value={password} required> -->
             <input type="password" placeholder="Password" bind:value={password} on:input={clearError} required>
   
              <!-- Add the error message display here -->
